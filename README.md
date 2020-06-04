@@ -12,7 +12,7 @@ Step #3:
 Open the developer console on your browser.
 
 Step #4:
-Paste the contents on script.js into the console and hit enter.
+Paste the contents of script.js into the console and hit enter.
 
 Step #5:
 Watch the script autonomously dock with the ISS.
