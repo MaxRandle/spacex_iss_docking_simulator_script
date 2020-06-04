@@ -1,6 +1,6 @@
 # spacex_iss_docking_simulator_script
 
-autonomously dock the Spacex Dragon crew capsule to the International Space Station
+Autonomously dock the Spacex Dragon crew capsule to the International Space Station.
 
 Step #1:
 Visit https://iss-sim.spacex.com/
