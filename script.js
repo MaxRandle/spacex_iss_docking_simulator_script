@@ -12,9 +12,9 @@ const rk = 0.02;
 const rd = 1.8;
 
 // translation spring constant
-const tk = 0.01;
+const tk = 0.025;
 //translation damping constant
-const td = 2.5;
+const td = 8;
 
 const loop = async () => {
 	console.log("autopilot engaged");
@@ -58,26 +58,39 @@ const loop = async () => {
 
 		const targetXVelocity = -tk * xRange - td * currentXVelocity;
 		const targetYVelocity = -tk * yRange - td * currentYVelocity;
-		const targetZVelocity = -tk * zRange - td * currentZVelocity;
+		const targetZVelocity = -tk * zRange - td * currentZVelocity - 0.005;
+
+		const shouldTranslate = (targetVelocity, currentVelocity, pulse) => {
+			//will translating get me closer to my target velocity
+			const newVelocity = currentVelocity + pulse;
+			return Math.abs(targetVelocity - newVelocity) < Math.abs(targetVelocity - currentVelocity);
+		};
+
+		const onTarget = (range, currentVelocity) => {
+			return Math.abs(range) < 0.15 && Math.abs(currentVelocity) < translationPulseSize / 5;
+		};
 
 		// x
-		if (currentXVelocity > targetXVelocity && currentXVelocity - targetXVelocity > translationPulseSize / 2) {
+		if (!onTarget(xRange, currentXVelocity) && shouldTranslate(targetXVelocity, currentXVelocity, -translationPulseSize)) {
 			translateLeft();
-		} else if (currentXVelocity < targetXVelocity && currentXVelocity - targetXVelocity < translationPulseSize / 2) {
+		}
+		if (!onTarget(xRange, currentXVelocity) && shouldTranslate(targetXVelocity, currentXVelocity, translationPulseSize)) {
 			translateRight();
 		}
 
 		// y
-		if (currentYVelocity > targetYVelocity && currentYVelocity - targetYVelocity > translationPulseSize / 2) {
+		if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, -translationPulseSize)) {
 			translateDown();
-		} else if (currentYVelocity < targetYVelocity && currentYVelocity - targetYVelocity < translationPulseSize / 2) {
+		}
+		if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, translationPulseSize)) {
 			translateUp();
 		}
 
 		// z
-		if (currentZVelocity > targetZVelocity && currentZVelocity - targetZVelocity > translationPulseSize / 2) {
+		if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, -translationPulseSize)) {
 			translateForward();
-		} else if (currentZVelocity < targetZVelocity && currentZVelocity - targetZVelocity < translationPulseSize / 2) {
+		}
+		if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, translationPulseSize)) {
 			translateBackward();
 		}
 
