@@ -12,9 +12,9 @@ const rk = 0.02;
 const rd = 1.8;
 
 // translation spring constant
-const tk = 0.1;
+const tk = 0.01;
 //translation damping constant
-const td = 0;
+const td = 2.5;
 
 const loop = async () => {
 	console.log("autopilot engaged");
@@ -67,24 +67,19 @@ const loop = async () => {
 			translateRight();
 		}
 
-		// // x
-		// if (Math.abs(xRange) > rangeTolerance && xVelocity - targetXVelocity > velocityTolerance) {
-		//   translateLeft();
-		// } else if (Math.abs(xRange) > rangeTolerance && xVelocity < targetXVelocity) {
-		//   translateRight();
-		// }
-		// // y
-		// if (Math.abs(yRange) > rangeTolerance && yVelocity - targetYVelocity > velocityTolerance) {
-		//   translateDown();
-		// } else if (Math.abs(yRange) > rangeTolerance && yVelocity < targetYVelocity) {
-		//   translateUp();
-		// }
-		// // z
-		// if (Math.abs(zRange) > rangeTolerance && zVelocity - targetZVelocity > velocityTolerance) {
-		//   translateForward();
-		// } else if (Math.abs(zRange) > rangeTolerance && zVelocity < targetZVelocity) {
-		//   translateBackward();
-		// }
+		// y
+		if (currentYVelocity > targetYVelocity && currentYVelocity - targetYVelocity > translationPulseSize / 2) {
+			translateDown();
+		} else if (currentYVelocity < targetYVelocity && currentYVelocity - targetYVelocity < translationPulseSize / 2) {
+			translateUp();
+		}
+
+		// z
+		if (currentZVelocity > targetZVelocity && currentZVelocity - targetZVelocity > translationPulseSize / 2) {
+			translateForward();
+		} else if (currentZVelocity < targetZVelocity && currentZVelocity - targetZVelocity < translationPulseSize / 2) {
+			translateBackward();
+		}
 
 		await sleep(sleepTime);
 	}
