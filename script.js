@@ -12,7 +12,7 @@ const rk = 0.02;
 const rb = Math.sqrt(4 * rk);
 
 // translation spring constant
-const tk = 0.01;
+const tk = 0.005;
 // translation critical damping constant
 const tb = Math.sqrt(4 * tk);
 
