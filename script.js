@@ -56,9 +56,9 @@ const loop = async () => {
 		const zRange = camera.position.z - issObject.position.z;
 		const { x: currentXVelocity, y: currentYVelocity, z: currentZVelocity } = motionVector;
 
-		const targetXVelocity = -tk * xRange - td * currentXVelocity;
-		const targetYVelocity = -tk * yRange - td * currentYVelocity;
-		const targetZVelocity = -tk * zRange - td * currentZVelocity - 0.01;
+		const targetXVelocity = -tk * xRange - tb * currentXVelocity;
+		const targetYVelocity = -tk * yRange - tb * currentYVelocity;
+		const targetZVelocity = -tk * zRange - tb * currentZVelocity - 0.01;
 
 		const shouldTranslate = (targetVelocity, currentVelocity, pulse) => {
 			// will translating get me closer to my target velocity
@@ -78,21 +78,21 @@ const loop = async () => {
 			translateRight();
 		}
 
-		// y
-		if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, -translationPulseSize)) {
-			translateDown();
-		}
-		if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, translationPulseSize)) {
-			translateUp();
-		}
+		// // y
+		// if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, -translationPulseSize)) {
+		// 	translateDown();
+		// }
+		// if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, translationPulseSize)) {
+		// 	translateUp();
+		// }
 
-		// z
-		if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, -translationPulseSize)) {
-			translateForward();
-		}
-		if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, translationPulseSize)) {
-			translateBackward();
-		}
+		// // z
+		// if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, -translationPulseSize)) {
+		// 	translateForward();
+		// }
+		// if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, translationPulseSize)) {
+		// 	translateBackward();
+		// }
 
 		await sleep(sleepTime);
 	}
