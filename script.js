@@ -12,9 +12,9 @@ const rk = 0.02;
 const rd = 1.8;
 
 // translation spring constant
-const tk = 0.025;
+const tk = 0.04;
 //translation damping constant
-const td = 8;
+const td = 18;
 
 const loop = async () => {
 	console.log("autopilot engaged");
@@ -50,7 +50,7 @@ const loop = async () => {
 			rollLeft();
 		}
 
-		// // Translational adjustments
+		// Translational adjustments
 		const xRange = camera.position.x - issObject.position.x;
 		const yRange = camera.position.y - issObject.position.y;
 		const zRange = camera.position.z - issObject.position.z;
@@ -58,16 +58,16 @@ const loop = async () => {
 
 		const targetXVelocity = -tk * xRange - td * currentXVelocity;
 		const targetYVelocity = -tk * yRange - td * currentYVelocity;
-		const targetZVelocity = -tk * zRange - td * currentZVelocity - 0.005;
+		const targetZVelocity = -tk * zRange - td * currentZVelocity - 0.01;
 
 		const shouldTranslate = (targetVelocity, currentVelocity, pulse) => {
-			//will translating get me closer to my target velocity
+			// will translating get me closer to my target velocity
 			const newVelocity = currentVelocity + pulse;
 			return Math.abs(targetVelocity - newVelocity) < Math.abs(targetVelocity - currentVelocity);
 		};
 
 		const onTarget = (range, currentVelocity) => {
-			return Math.abs(range) < 0.15 && Math.abs(currentVelocity) < translationPulseSize / 5;
+			return Math.abs(range) < 0.05 && Math.abs(currentVelocity) < translationPulseSize / 5;
 		};
 
 		// x
