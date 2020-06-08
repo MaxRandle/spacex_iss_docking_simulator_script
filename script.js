@@ -4,17 +4,17 @@ function sleep(ms) {
 
 const rotationIncrement = rotationPulseSize * toRAD * 0.01;
 // time between each loop
-const sleepTime = 100;
+const sleepTime = 20;
 
 // rotation spring constant
 const rk = 0.02;
-// rotation damping constant
-const rd = 1.8;
+// rotation critical damping constant
+const rb = Math.sqrt(4 * rk);
 
 // translation spring constant
-const tk = 0.04;
-//translation damping constant
-const td = 18;
+const tk = 0.005;
+// translation critical damping constant
+const tb = Math.sqrt(4 * tk);
 
 const loop = async () => {
 	console.log("autopilot engaged");
@@ -25,9 +25,9 @@ const loop = async () => {
 		const rotationY = camera.rotation.y;
 		const rotationZ = camera.rotation.z;
 		// roll right decreaces
-		const targetRotationXRate = -rk * rotationX - rd * currentRotationX;
-		const targetRotationYRate = -rk * rotationY - rd * currentRotationY;
-		const targetRotationZRate = -rk * rotationZ - rd * currentRotationZ;
+		const targetRotationXRate = -rk * rotationX - rb * currentRotationX;
+		const targetRotationYRate = -rk * rotationY - rb * currentRotationY;
+		const targetRotationZRate = -rk * rotationZ - rb * currentRotationZ;
 
 		// pitch
 		if (currentRotationX > targetRotationXRate && currentRotationX - targetRotationXRate > rotationIncrement / 2) {
