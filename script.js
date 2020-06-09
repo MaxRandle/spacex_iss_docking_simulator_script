@@ -1,6 +1,12 @@
 function sleep(ms) {
-	return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
+
+const shouldMove = (targetVelocity, currentVelocity, pulse) => {
+  // will moving get me closer to my target velocity
+  const newVelocity = currentVelocity + pulse;
+  return Math.abs(targetVelocity - newVelocity) < Math.abs(targetVelocity - currentVelocity);
+};
 
 const rotationIncrement = rotationPulseSize * toRAD * 0.01;
 // time between each loop
@@ -12,90 +18,74 @@ const rk = 0.02;
 const rb = Math.sqrt(4 * rk);
 
 // translation spring constant
-const tk = 0.005;
+const tk = 0.8;
 // translation critical damping constant
 const tb = Math.sqrt(4 * tk);
 
 const loop = async () => {
-	console.log("autopilot engaged");
+  console.log("autopilot engaged");
 
-	while (true) {
-		// Rotaion adjustments
-		const rotationX = camera.rotation.x;
-		const rotationY = camera.rotation.y;
-		const rotationZ = camera.rotation.z;
-		// roll right decreaces
-		const targetRotationXRate = -rk * rotationX - rb * currentRotationX;
-		const targetRotationYRate = -rk * rotationY - rb * currentRotationY;
-		const targetRotationZRate = -rk * rotationZ - rb * currentRotationZ;
+  while (true) {
+    // rotaion
+    const rotationX = camera.rotation.x;
+    const rotationY = camera.rotation.y;
+    const rotationZ = camera.rotation.z;
+    const targetRotationXRate = -rk * rotationX - rb * currentRotationX;
+    const targetRotationYRate = -rk * rotationY - rb * currentRotationY;
+    const targetRotationZRate = -rk * rotationZ - rb * currentRotationZ;
 
-		// pitch
-		if (currentRotationX > targetRotationXRate && currentRotationX - targetRotationXRate > rotationIncrement / 2) {
-			pitchDown();
-		} else if (currentRotationX < targetRotationXRate && currentRotationX - targetRotationXRate < rotationIncrement / 2) {
-			pitchUp();
-		}
+    // translation
+    const xRange = camera.position.x - issObject.position.x;
+    const yRange = camera.position.y - issObject.position.y;
+    const zRange = camera.position.z - issObject.position.z;
+    const currentXVelocity = motionVector.x * 50;
+    const currentYVelocity = motionVector.y * 50;
+    const currentZVelocity = motionVector.z * 50;
+    const targetXVelocity = -tk * xRange - tb * currentXVelocity;
+    const targetYVelocity = -tk * yRange - tb * currentYVelocity;
+    const targetZVelocity = -tk * zRange - tb * currentZVelocity - 0.01;
 
-		// yaw
-		if (currentRotationY > targetRotationYRate && currentRotationY - targetRotationYRate > rotationIncrement / 2) {
-			yawRight();
-		} else if (currentRotationY < targetRotationYRate && currentRotationY - targetRotationYRate < rotationIncrement / 2) {
-			yawLeft();
-		}
+    // rotation
+    if (shouldMove(targetRotationXRate, currentRotationX, -rotationIncrement)) {
+      pitchDown();
+    }
+    if (shouldMove(targetRotationXRate, currentRotationX, rotationIncrement)) {
+      pitchUp();
+    }
+    if (shouldMove(targetRotationYRate, currentRotationY, -rotationIncrement)) {
+      yawRight();
+    }
+    if (shouldMove(targetRotationYRate, currentRotationY, rotationIncrement)) {
+      yawLeft();
+    }
+    if (shouldMove(targetRotationZRate, currentRotationZ, -rotationIncrement)) {
+      rollRight();
+    }
+    if (shouldMove(targetRotationZRate, currentRotationZ, rotationIncrement)) {
+      rollLeft();
+    }
+    // translation
+    if (shouldMove(targetXVelocity, currentXVelocity, -translationPulseSize)) {
+      translateLeft();
+    }
+    if (shouldMove(targetXVelocity, currentXVelocity, translationPulseSize)) {
+      translateRight();
+    }
+    if (shouldMove(targetYVelocity, currentYVelocity, -translationPulseSize)) {
+      translateDown();
+    }
+    if (shouldMove(targetYVelocity, currentYVelocity, translationPulseSize)) {
+      translateUp();
+    }
+    if (shouldMove(targetZVelocity, currentZVelocity, -translationPulseSize)) {
+      translateForward();
+    }
+    if (shouldMove(targetZVelocity, currentZVelocity, translationPulseSize)) {
+      translateBackward();
+    }
 
-		// roll
-		if (currentRotationZ > targetRotationZRate && currentRotationZ - targetRotationZRate > rotationIncrement / 2) {
-			rollRight();
-		} else if (currentRotationZ < targetRotationZRate && currentRotationZ - targetRotationZRate < rotationIncrement / 2) {
-			rollLeft();
-		}
-
-		// Translational adjustments
-		const xRange = camera.position.x - issObject.position.x;
-		const yRange = camera.position.y - issObject.position.y;
-		const zRange = camera.position.z - issObject.position.z;
-		const { x: currentXVelocity, y: currentYVelocity, z: currentZVelocity } = motionVector;
-
-		const targetXVelocity = -tk * xRange - tb * currentXVelocity;
-		const targetYVelocity = -tk * yRange - tb * currentYVelocity;
-		const targetZVelocity = -tk * zRange - tb * currentZVelocity - 0.01;
-
-		const shouldTranslate = (targetVelocity, currentVelocity, pulse) => {
-			// will translating get me closer to my target velocity
-			const newVelocity = currentVelocity + pulse;
-			return Math.abs(targetVelocity - newVelocity) < Math.abs(targetVelocity - currentVelocity);
-		};
-
-		const onTarget = (range, currentVelocity) => {
-			return Math.abs(range) < 0.05 && Math.abs(currentVelocity) < translationPulseSize / 5;
-		};
-
-		// x
-		if (!onTarget(xRange, currentXVelocity) && shouldTranslate(targetXVelocity, currentXVelocity, -translationPulseSize)) {
-			translateLeft();
-		}
-		if (!onTarget(xRange, currentXVelocity) && shouldTranslate(targetXVelocity, currentXVelocity, translationPulseSize)) {
-			translateRight();
-		}
-
-		// // y
-		// if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, -translationPulseSize)) {
-		// 	translateDown();
-		// }
-		// if (!onTarget(yRange, currentYVelocity) && shouldTranslate(targetYVelocity, currentYVelocity, translationPulseSize)) {
-		// 	translateUp();
-		// }
-
-		// // z
-		// if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, -translationPulseSize)) {
-		// 	translateForward();
-		// }
-		// if (!onTarget(zRange, currentZVelocity) && shouldTranslate(targetZVelocity, currentZVelocity, translationPulseSize)) {
-		// 	translateBackward();
-		// }
-
-		await sleep(sleepTime);
-	}
+    await sleep(sleepTime);
+  }
 };
 
 loop();
