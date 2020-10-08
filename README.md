@@ -12,7 +12,6 @@ Step #3:
 Open the developer console on your browser.
 
 Step #4:
-Paste the contents of script.js into the console and hit enter.
+Paste the contents of script.js into the console and hit enter. If it worked you should get a new button in the top left of your screen labelled "A"
 
-Step #5:
-Watch the script autonomously dock with the ISS.
+Step #5: Click the button to toggle the autopilot and watch the script autonomously dock with the ISS.
